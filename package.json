@@ -1,0 +1,16 @@
+{
+  "name": "daily-message-app",
+  "version": "1.0.0",
+  "description": "Two-user daily public message site with first-login password setup and local backups.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.17.3"
+  }
+}
