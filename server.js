@@ -96,6 +96,10 @@ function countHan(s) {
 
 function pageLayout(title, bodyHtml, opts = {}) {
   const loggedUser = opts.user || null;
+  const navHtml = loggedUser
+    ? '<span class="toplink muted">已登录：' + escapeHtml(loggedUser) + '</span> <a class="toplink" href="/me">我的</a> <a class="toplink" href="/logout">退出</a>'
+    : '<a class="toplink" href="/login">登录/设定密码</a>';
+
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -103,82 +107,52 @@ function pageLayout(title, bodyHtml, opts = {}) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${title}</title>
   <style>
-    :root {
-      --bg: #f7f7fb;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --primary: #2563eb;
-      --primary-600: #1d4ed8;
-      --accent: #14b8a6;
-    }
+    :root { --bg:#f7f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb; --primary:#2563eb; --primary-600:#1d4ed8; --accent:#14b8a6; }
     @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0b1220;
-        --card: #111827;
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --border: #1f2937;
-        --primary: #60a5fa;
-        --primary-600: #3b82f6;
-        --accent: #2dd4bf;
-      }
+      :root { --bg:#0b1220; --card:#111827; --text:#e5e7eb; --muted:#9ca3af; --border:#1f2937; --primary:#60a5fa; --primary-600:#3b82f6; --accent:#2dd4bf; }
     }
-    * { box-sizing: border-box; }
-    body { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: var(--text); background:
-      radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,.10), transparent 40%),
-      radial-gradient(1200px 600px at 110% -20%, rgba(45,212,191,.10), transparent 40%),
-      var(--bg);
-      max-width: 860px; margin: 0 auto; padding: 0 18px 48px; }
-    header { position: sticky; top: 0; z-index: 10; background: linear-gradient(90deg, #6366f1, #22d3ee); color: #fff; border-radius: 0 0 16px 16px; box-shadow: 0 2px 12px rgba(0,0,0,.15); margin-bottom: 22px; }
-    .inner { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; }
-    .brand { font-weight: 800; letter-spacing: .5px; font-size: 18px; }
-    nav a, .toplink { color: #fff; text-decoration: none; opacity:.95; margin-left: 12px; }
-    nav a:hover { opacity: 1; text-decoration: underline; }
-    .container { margin-top: 18px; }
-
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin: 14px 0; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
-    .muted { color: var(--muted); font-size: 14px; }
-
-    input, select, textarea, button { font-size: 16px; }
-    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: transparent; color: inherit; outline: none; transition: box-shadow .2s, border-color .2s; }
-    textarea { min-height: 110px; resize: vertical; }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent); }
-
-    .row { display:flex; gap:12px; align-items:center; }
-    .right { text-align:right; }
-
-    .btn { display:inline-flex; align-items:center; gap:8px; border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border)); background: var(--primary); color:#fff; padding: 10px 14px; border-radius: 999px; cursor: pointer; transition: transform .04s ease, box-shadow .2s, background .2s; box-shadow: 0 8px 20px rgba(37,99,235,.25); }
-    .btn:hover { background: var(--primary-600); box-shadow: 0 10px 24px rgba(37,99,235,.35); }
-    .btn:active { transform: translateY(1px); }
-    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); box-shadow: none; }
-
-    /* message card */
-    .msg { padding: 14px 16px; }
-    .msg-head { display:flex; gap:12px; align-items:center; }
-    .avatar { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:700; letter-spacing:.5px; }
-    .avatar.diane { background: linear-gradient(135deg, #6366f1, #22d3ee); }
-    .avatar.rayko  { background: linear-gradient(135deg, #f59e0b, #ef4444); }
-    .meta .name { font-weight: 700; }
-    .meta .time { font-size: 12px; color: var(--muted); }
-    .msg-text { margin-top: 8px; white-space: pre-wrap; line-height: 1.7; }
-
-    /* counters */
-    #counter { font-variant-numeric: tabular-nums; }
-    .overlimit { color: #b91c1c; font-weight: 700; }
-
-    footer { text-align:center; margin: 24px 0; color: var(--muted); font-size:13px; }
+    *{box-sizing:border-box}
+    body{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--text);
+      background:radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,.10), transparent 40%),
+                 radial-gradient(1200px 600px at 110% -20%, rgba(45,212,191,.10), transparent 40%),
+                 var(--bg);
+      max-width:860px;margin:0 auto;padding:0 18px 48px}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,#6366f1,#22d3ee);color:#fff;border-radius:0 0 16px 16px;box-shadow:0 2px 12px rgba(0,0,0,.15);margin-bottom:22px}
+    .inner{display:flex;justify-content:space-between;align-items:center;padding:14px 10px}
+    .brand{font-weight:800;letter-spacing:.5px;font-size:18px}
+    nav a,.toplink{color:#fff;text-decoration:none;opacity:.95;margin-left:12px}
+    nav a:hover{opacity:1;text-decoration:underline}
+    .container{margin-top:18px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+    .muted{color:var(--muted);font-size:14px}
+    input,select,textarea,button{font-size:16px}
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:transparent;color:inherit;outline:none;transition:box-shadow .2s,border-color .2s}
+    textarea{min-height:110px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent)}
+    .row{display:flex;gap:12px;align-items:center}
+    .right{text-align:right}
+    .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid color-mix(in srgb, var(--primary) 35%, var(--border));background:var(--primary);color:#fff;padding:10px 14px;border-radius:999px;cursor:pointer;transition:transform .04s ease,box-shadow .2s,background .2s;box-shadow:0 8px 20px rgba(37,99,235,.25)}
+    .btn:hover{background:var(--primary-600);box-shadow:0 10px 24px rgba(37,99,235,.35)}
+    .btn:active{transform:translateY(1px)}
+    .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+    .msg{padding:14px 16px}
+    .msg-head{display:flex;gap:12px;align-items:center}
+    .avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.5px}
+    .avatar.diane{background:linear-gradient(135deg,#6366f1,#22d3ee)}
+    .avatar.rayko{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+    .meta .name{font-weight:700}
+    .meta .time{font-size:12px;color:var(--muted)}
+    .msg-text{margin-top:8px;white-space:pre-wrap;line-height:1.7}
+    #counter{font-variant-numeric:tabular-nums}
+    .overlimit{color:#b91c1c;font-weight:700}
+    footer{text-align:center;margin:24px 0;color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
 <header>
   <div class="inner">
     <div class="brand">每日留言</div>
-    <nav>
-      <a class="toplink" href="/">公开页</a>
-      ${loggedUser ? `<span class="toplink muted">已登录：${loggedUser}</span> <a class="toplink" href="/me">我的</a> <a class="toplink" href="/logout">退出</a>` : `<a class="toplink" href="/login">登录/设定密码</a>`}
-    </nav>
+    <nav>${navHtml}</nav>
   </div>
 </header>
 <div class="container">
@@ -188,30 +162,7 @@ ${bodyHtml}
 </body>
 </html>`;
 }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    nav a { margin-right: 12px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 12px 0; }
-    .muted { color: #666; font-size: 14px; }
-    input, select, textarea, button { font-size: 16px; padding: 8px; }
-    textarea { width: 100%; height: 96px; }
-    .err { color: #c00; }
-    .ok { color: #070; }
-    .row { display:flex; gap:12px; align-items:center; }
-    .right { text-align:right; }
-  </style>
-</head>
-<body>
-<header>
-  <div><strong>每日留言</strong></div>
-  <nav>
-    <a href="/">公开页</a>
-    ${loggedUser ? `<span class="muted">已登录：${loggedUser}</span> <a href="/me">我的</a> <a href="/logout">退出</a>` : `<a href="/login">登录/设定密码</a>`}
-  </nav>
-</header>
-${bodyHtml}
-</body>
-</html>`;
-}
+
 
 function messageCard(msg) {
   const when = new Date(msg.createdAt);
